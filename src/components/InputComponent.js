@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function InputComponent({ onSubmit }) {
+function InputComponent({ onSubmit, placeholder }) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
@@ -17,7 +17,7 @@ function InputComponent({ onSubmit }) {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Posez votre question ici..."
+        placeholder={placeholder}
       />
       <button type="submit">Envoyer</button>
     </form>

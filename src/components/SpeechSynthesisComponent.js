@@ -19,6 +19,7 @@ function SpeechSynthesisComponent({ text, language }) {
       };
 
       const preferredVoice = availableVoices.find(voice => voice.name === preferredVoices[language]);
+      console.log('Verifying value of preferredVoice:', preferredVoice)
       setSelectedVoice(preferredVoice || availableVoices[0]);
     };
 
@@ -34,6 +35,7 @@ function SpeechSynthesisComponent({ text, language }) {
       const utterance = new SpeechSynthesisUtterance(text);
       //utterance.voice = selectedVoice;
       utterance.lang = language;
+      console.log('Speaking with voice:', utterance.voice);
       synth.speak(utterance);
     }
   }, [text, selectedVoice, language]);
