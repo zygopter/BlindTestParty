@@ -20,6 +20,7 @@ function App() {
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
   const [theme, setTheme] = useState('');
+  const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
 
   const handleStartGame = async () => {
@@ -49,25 +50,43 @@ function App() {
   const handleStartSong = async () => {
     try {
       const data = await startSong(gameId);
+      setGameStep('playClip');
       setResponses([...responses, data.parsedAnswer.texte]);
       setSpeechText(data.parsedAnswer.texte);
-      setGameStep('playClip');
+      if (currentSound.current) {
+        currentSound.current.stop();
+      }
+
+      currentSound.current = new Howl({
+        src: [data.trackUrl],
+        html5: true, // Utiliser HTML5 pour charger de longues pistes
+      });
     } catch (error) {
       console.error('Error starting song:', error);
+    }
+  };
+
+  const playSong = () => {
+    if (currentSound.current && gameStep === 'playClip') {
+      currentSound.current.play();
     }
   };
 
   const handleSubmitAnswer = async (userAnswer) => {
     try {
       const data = await submitAnswer(gameId, userAnswer);
-      setResponses([...responses, data.gptAnswer]);
+      setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
 
+      setSpeechText(data.parsedAnswer.texte);
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
         setGameStep('startSong');
       } else {
         // Relancer l'extrait si la réponse est incorrecte
+        if (currentSound.current) {
+          currentSound.current.play();
+        }
         setGameStep('playClip');
       }
     } catch (error) {
@@ -79,7 +98,7 @@ function App() {
     <div className="App">
       <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
       <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
-      <SpeechSynthesisComponent text={speechText} language={language} />
+      <SpeechSynthesisComponent text={speechText} language={language} onSpeechEnd={playSong} />
 
       {gameStep === 'intro' && <button onClick={handleStartGame}>Démarrer le jeu</button>}
       {gameStep === 'chooseTheme' && <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />}

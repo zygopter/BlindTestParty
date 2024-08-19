@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function SpeechSynthesisComponent({ text, language }) {
+function SpeechSynthesisComponent({ text, language, onSpeechEnd }) {
   const [selectedVoice, setSelectedVoice] = useState(null);
 
   useEffect(() => {
@@ -70,12 +70,16 @@ function SpeechSynthesisComponent({ text, language }) {
       for (const segment of textSegments) {
         await speakText(segment);
       }
+
+      if (onSpeechEnd) {
+        onSpeechEnd(); // Appeler le callback lorsque le TTS est terminé
+      }
     };
 
     if (text && selectedVoice) {
       splitAndSpeak(text);
     }
-  }, [text, selectedVoice, language]);
+  }, [text, selectedVoice, language, onSpeechEnd]);
 
   return null;
 }
