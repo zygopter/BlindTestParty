@@ -79,7 +79,7 @@ function SpeechSynthesisComponent({ text, language, onSpeechEnd }) {
     if (text && selectedVoice) {
       splitAndSpeak(text);
     }
-  }, [text, selectedVoice, language, onSpeechEnd]);
+  }, [text, selectedVoice, language]);
 
   return null;
 }
