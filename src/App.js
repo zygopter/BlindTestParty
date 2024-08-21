@@ -22,6 +22,7 @@ function App() {
   const [theme, setTheme] = useState('');
   const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
+  const [extraitCount, setExtraitCount] = useState(0);
 
   const handleStartGame = async () => {
     try {
@@ -48,6 +49,11 @@ function App() {
   };
 
   const handleStartSong = async () => {
+    if (extraitCount >= 5) {
+      setSpeechText('Le jeu est terminé ! Vous avez joué tous les extraits.');
+      setGameStep('end'); // Marquer la fin du jeu
+      return;
+    }
     try {
       const data = await startSong(gameId);
       setGameStep('playClip');
@@ -81,6 +87,14 @@ function App() {
       setSpeechText(data.parsedAnswer.texte);
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
+        const newExtraitCount = extraitCount + 1;
+        setExtraitCount(newExtraitCount);
+        if (newExtraitCount >= 5) {
+          setSpeechText('Félicitations ! Vous avez deviné 5 extraits. Le jeu est terminé.');
+          setGameStep('end');
+        } else {
+          setGameStep('startSong');
+        }
         setGameStep('startSong');
       } else {
         // The extract will relaunch by itself after the end of speech with the onSpeechEnd callback
@@ -109,9 +123,11 @@ function App() {
       {gameStep === 'startSong' && <button onClick={handleStartSong}>Lancer l'extrait</button>}
       {gameStep === 'playClip' && <button onClick={handleStopSong}>Arrêter l'extrait et deviner le titre</button>}
       {gameStep === 'guessTitle' && <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />}
+      {gameStep === 'end' && <div>Le jeu est terminé. Votre score : {points} points.</div>}
 
       <ResponsesComponent responses={responses} />
       <div>Points: {points}</div>
+      <div>Extraits devinés : {extraitCount}/5</div>
     </div>
   );
 }
