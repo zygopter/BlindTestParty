@@ -8,8 +8,8 @@ import { startGame, chooseTheme, startSong, submitAnswer } from './api/game';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
-import SpeechSynthesisComponent from './components/SpeechSynthesisComponent';
 import LanguageSelector from './components/LanguageSelector';
+import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
 import sendMessageToGPT from './api/sendMessageToGPT';
 
@@ -23,13 +23,14 @@ function App() {
   const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
   const [extraitCount, setExtraitCount] = useState(0);
+  const { speak } = useSpeechSynthesis(language);
 
   const handleStartGame = async () => {
     try {
       const data = await startGame();
       setGameId(data.gameId);
       setResponses([data.gptAnswer]);
-      setSpeechText(data.gptAnswer);
+      await speak(data.gptAnswer);
       setGameStep('chooseTheme');
     } catch (error) {
       console.error('Error starting game:', error);
@@ -41,7 +42,7 @@ function App() {
       const data = await chooseTheme(gameId, theme);
       setTheme(data.gameState.theme);
       setResponses([...responses, data.gptAnswer]);
-      setSpeechText(data.gptAnswer);
+      await speak(data.gptAnswer);
       setGameStep('startSong');
     } catch (error) {
       console.error('Error choosing theme:', error);
@@ -50,7 +51,7 @@ function App() {
 
   const handleStartSong = async () => {
     if (extraitCount >= 5) {
-      setSpeechText('Le jeu est terminé ! Vous avez joué tous les extraits.');
+      await speak('Le jeu est terminé ! Vous avez joué tous les extraits.');
       setGameStep('end'); // Marquer la fin du jeu
       return;
     }
@@ -58,15 +59,19 @@ function App() {
       const data = await startSong(gameId);
       setGameStep('playClip');
       setResponses([...responses, data.parsedAnswer.texte]);
-      setSpeechText(data.parsedAnswer.texte);
       if (currentSound.current) {
         currentSound.current.stop();
       }
+      await speak(data.parsedAnswer.texte);
 
       currentSound.current = new Howl({
         src: [data.trackUrl],
         html5: true, // Utiliser HTML5 pour charger de longues pistes
       });
+
+      if (currentSound.current) {
+        currentSound.current.play();
+      }
     } catch (error) {
       console.error('Error starting song:', error);
     }
@@ -84,17 +89,11 @@ function App() {
       setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
 
-      setSpeechText(data.parsedAnswer.texte);
+      await speak(data.parsedAnswer.texte);
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
         const newExtraitCount = extraitCount + 1;
         setExtraitCount(newExtraitCount);
-        if (newExtraitCount >= 5) {
-          setSpeechText('Félicitations ! Vous avez deviné 5 extraits. Le jeu est terminé.');
-          setGameStep('end');
-        } else {
-          setGameStep('startSong');
-        }
         setGameStep('startSong');
       } else {
         // The extract will relaunch by itself after the end of speech with the onSpeechEnd callback
@@ -112,11 +111,17 @@ function App() {
     setGameStep('guessTitle');
   };
 
+  useEffect(() => {
+    if (extraitCount >= 5) {
+      speak('Félicitations ! Vous avez deviné 5 extraits. Le jeu est terminé.');
+      setGameStep('end');
+    }
+  }, [extraitCount]);
+
   return (
     <div className="App">
       <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
       <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
-      <SpeechSynthesisComponent text={speechText} language={language} onSpeechEnd={playSong} />
 
       {gameStep === 'intro' && <button onClick={handleStartGame}>Démarrer le jeu</button>}
       {gameStep === 'chooseTheme' && <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />}
