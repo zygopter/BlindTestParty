@@ -45,3 +45,14 @@ export const submitAnswer = async (gameId, userAnswer) => {
     throw error;
   }
 };
+
+// Fonction pour compléter une réponse
+export const completeAnswer = async (gameId, userAnswer) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/game/complete-answer`, { gameId, userAnswer });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to complete the answer:', error);
+    throw error;
+  }
+};
