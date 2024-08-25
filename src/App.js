@@ -4,14 +4,12 @@ import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import axios from 'axios';
-import { startGame, chooseTheme, startSong, submitAnswer } from './api/game';
+import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer } from './api/game';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
 import LanguageSelector from './components/LanguageSelector';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
-import GameSteps from './utils/GameSteps';
-import sendMessageToGPT from './api/sendMessageToGPT';
 
 function App() {
   const [gameId, setGameId] = useState(null);
@@ -24,6 +22,7 @@ function App() {
   const [points, setPoints] = useState(0);
   const [excerptCount, setExcerptCount] = useState(0);
   const [maxExcerpts, setMaxExcerpts] = useState(5);
+  const [tentativeCount, setTentativeCount] = useState(0);
   const { speak } = useSpeechSynthesis(language);
 
   const handleStartGame = async () => {
@@ -78,26 +77,34 @@ function App() {
     }
   };
 
-  const playSong = () => {
-    if (currentSound.current && gameStep === 'playClip') {
-      currentSound.current.play();
-    }
-  };
-
   const handleSubmitAnswer = async (userAnswer) => {
     try {
-      const data = await submitAnswer(gameId, userAnswer);
+      let data;
+      if (tentativeCount === 0) {
+        data = await submitAnswer(gameId, userAnswer);
+      } else {
+        data = await completeAnswer(gameId, userAnswer);
+      }
       setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
 
       await speak(data.parsedAnswer.texte);
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
+        setTentativeCount(0);
+        const newExtraitCount = excerptCount + 1;
+        setExcerptCount(newExtraitCount);
+        setGameStep('startSong');
+      } else if (tentativeCount > 0) {
+        setTentativeCount(0);
         const newExtraitCount = excerptCount + 1;
         setExcerptCount(newExtraitCount);
         setGameStep('startSong');
       } else {
-        // The extract will relaunch by itself after the end of speech with the onSpeechEnd callback
+        setTentativeCount(1);
+        if (currentSound.current) {
+          currentSound.current.play();
+        }
         setGameStep('playClip');
       }
     } catch (error) {
