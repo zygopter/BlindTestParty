@@ -22,7 +22,8 @@ function App() {
   const [theme, setTheme] = useState('');
   const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
-  const [extraitCount, setExtraitCount] = useState(0);
+  const [excerptCount, setExcerptCount] = useState(0);
+  const [maxExcerpts, setMaxExcerpts] = useState(5);
   const { speak } = useSpeechSynthesis(language);
 
   const handleStartGame = async () => {
@@ -50,7 +51,7 @@ function App() {
   };
 
   const handleStartSong = async () => {
-    if (extraitCount >= 5) {
+    if (excerptCount >= 5) {
       await speak('Le jeu est terminé ! Vous avez joué tous les extraits.');
       setGameStep('end'); // Marquer la fin du jeu
       return;
@@ -92,8 +93,8 @@ function App() {
       await speak(data.parsedAnswer.texte);
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
-        const newExtraitCount = extraitCount + 1;
-        setExtraitCount(newExtraitCount);
+        const newExtraitCount = excerptCount + 1;
+        setExcerptCount(newExtraitCount);
         setGameStep('startSong');
       } else {
         // The extract will relaunch by itself after the end of speech with the onSpeechEnd callback
@@ -111,19 +112,31 @@ function App() {
     setGameStep('guessTitle');
   };
 
+  const handleExcerptsChange = (e) => {
+    setMaxExcerpts(Number(e.target.value));
+  };
+
   useEffect(() => {
-    if (extraitCount >= 5) {
-      speak('Félicitations ! Vous avez deviné 5 extraits. Le jeu est terminé.');
+    if (excerptCount >= maxExcerpts) {
+      speak('Félicitations ! Vous avez deviné ${maxExcerpts} extraits. Le jeu est terminé.');
       setGameStep('end');
     }
-  }, [extraitCount]);
+  }, [excerptCount]);
 
   return (
     <div className="App">
       <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
       <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
 
-      {gameStep === 'intro' && <button onClick={handleStartGame}>Démarrer le jeu</button>}
+      {gameStep === 'intro' && (
+        <div>
+          <label>
+            Nombre d'extraits :
+            <input type="number" value={maxExcerpts} onChange={handleExcerptsChange} min="1" />
+          </label>
+          <button onClick={handleStartGame}>Démarrer le jeu</button>
+        </div>
+      )}
       {gameStep === 'chooseTheme' && <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />}
       {gameStep === 'startSong' && <button onClick={handleStartSong}>Lancer l'extrait</button>}
       {gameStep === 'playClip' && <button onClick={handleStopSong}>Arrêter l'extrait et deviner le titre</button>}
@@ -132,7 +145,7 @@ function App() {
 
       <ResponsesComponent responses={responses} />
       <div>Points: {points}</div>
-      <div>Extraits devinés : {extraitCount}/5</div>
+      <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
     </div>
   );
 }
