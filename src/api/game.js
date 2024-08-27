@@ -56,3 +56,14 @@ export const completeAnswer = async (gameId, userAnswer) => {
     throw error;
   }
 };
+
+// DEBUG: Log message history
+export const logMessageHistory = async (gameId) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/game/log-message-history`, { gameId });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to log the message history:', error);
+    throw error;
+  }
+};

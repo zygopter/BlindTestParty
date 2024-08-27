@@ -4,7 +4,7 @@ import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import axios from 'axios';
-import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer } from './api/game';
+import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer, logMessageHistory } from './api/game';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
@@ -130,6 +130,15 @@ function App() {
     }
   }, [excerptCount]);
 
+  const handleLogMessageHistory = async () => {
+    try {
+      const data = await logMessageHistory(gameId);
+      console.log(data);
+    } catch (error) {
+      console.error('Error starting song:', error);
+    }
+  }
+
   return (
     <div className="App">
       <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
@@ -153,6 +162,8 @@ function App() {
       <ResponsesComponent responses={responses} />
       <div>Points: {points}</div>
       <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
+
+      <button onClick={handleLogMessageHistory}>Log message history</button>
     </div>
   );
 }
