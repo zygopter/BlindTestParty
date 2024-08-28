@@ -10,6 +10,7 @@ import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
 import LanguageSelector from './components/LanguageSelector';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
+import GameSteps from './utils/GameSteps';
 
 function App() {
   const [gameId, setGameId] = useState(null);
@@ -112,6 +113,27 @@ function App() {
     }
   };
 
+  const handleSpeechReco = async (userAnswer) => {
+    try {
+      switch (gameStep) {
+        case GameSteps.CHOOSE_THEME:
+          handleChooseTheme(userAnswer);
+          break;
+        case GameSteps.START_SONG:
+          handleStartSong();
+          break;
+        case GameSteps.GUESS_TITLE:
+          handleSubmitAnswer(userAnswer);
+          break;
+
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error('Error handling speech recognition result:', error);
+    }
+  };
+
   const handleStopSong = () => {
     if (currentSound.current) {
       currentSound.current.stop();
@@ -142,7 +164,7 @@ function App() {
   return (
     <div className="App">
       <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
-      <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
+      <SpeechRecognitionComponent onResult={handleSpeechReco} language={language} />
 
       {gameStep === 'intro' && (
         <div>

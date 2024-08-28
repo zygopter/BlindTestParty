@@ -1,9 +1,21 @@
 // src/components/SpeechRecognitionComponent.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 function SpeechRecognitionComponent({ onResult, language }) {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+
+  const startListening = useCallback(() => {
+    if (recognition) {
+      recognition.start();
+    }
+  }, [recognition]);
+  
+  const stopListening = useCallback(() => {
+    if (recognition) {
+      recognition.stop();
+    }
+  }, [recognition]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -25,23 +37,12 @@ function SpeechRecognitionComponent({ onResult, language }) {
         .map(result => result[0])
         .map(result => result.transcript)
         .join('');
+      stopListening();
       onResult(transcript);
     };
 
     setRecognition(recognitionInstance);
-  }, [onResult, language]);
-
-  const startListening = () => {
-    if (recognition) {
-      recognition.start();
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition) {
-      recognition.stop();
-    }
-  };
+  }, [onResult, language, stopListening]);
 
   return (
     <div>
