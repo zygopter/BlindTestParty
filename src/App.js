@@ -93,13 +93,11 @@ function App() {
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
         setTentativeCount(0);
-        const newExtraitCount = excerptCount + 1;
-        setExcerptCount(newExtraitCount);
+        setExcerptCount((prevCount) => prevCount + 1);
         setGameStep('startSong');
       } else if (tentativeCount > 0) {
         setTentativeCount(0);
-        const newExtraitCount = excerptCount + 1;
-        setExcerptCount(newExtraitCount);
+        setExcerptCount((prevCount) => prevCount + 1);
         setGameStep('startSong');
       } else {
         setTentativeCount(1);
@@ -150,7 +148,7 @@ function App() {
       speak('Félicitations ! Vous avez deviné ${maxExcerpts} extraits. Le jeu est terminé.');
       setGameStep('end');
     }
-  }, [excerptCount]);
+  }, [excerptCount, maxExcerpts]);
 
   const handleLogMessageHistory = async () => {
     try {
