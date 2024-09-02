@@ -1,16 +1,16 @@
-import logo from './logo.svg';
 import './App.css';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
-import axios from 'axios';
 import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer, logMessageHistory } from './api/game';
+import MenuDropdown from './components/common/MenuDropDown';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
-import LanguageSelector from './components/LanguageSelector';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
+import InputModes from './utils/InputModes';
+
 
 function App() {
   const [gameId, setGameId] = useState(null);
@@ -24,8 +24,22 @@ function App() {
   const [excerptCount, setExcerptCount] = useState(0);
   const [maxExcerpts, setMaxExcerpts] = useState(5);
   const [tentativeCount, setTentativeCount] = useState(0);
+  const [inputMode, setInputMode] = useState(InputModes.TEXT);
   const { speak } = useSpeechSynthesis(language);
 
+  const languageOptions = [
+    { value: 'fr-FR', label: 'Français' },
+    { value: 'en-US', label: 'English' },
+    { value: 'es-ES', label: 'Español' },
+    { value: 'de-DE', label: 'Deutsch' },
+  ];
+
+  const modeOptions = [
+    { value: InputModes.TEXT, label: 'Texte' },
+    { value: InputModes.VOCAL, label: 'Vocal' },
+    { value: InputModes.MIXED, label: 'Mixte' },
+  ];
+  
   const handleStartGame = async () => {
     try {
       const data = await startGame();
@@ -139,6 +153,15 @@ function App() {
     setGameStep('guessTitle');
   };
 
+  const handleLanguageChange = (language) => {
+    console.log('Language selected:', language);
+    setLanguage(language);
+  };
+
+  const handleModeChange = (mode) => {
+    setInputMode(mode);
+  };
+
   const handleExcerptsChange = (e) => {
     setMaxExcerpts(Number(e.target.value));
   };
@@ -161,11 +184,24 @@ function App() {
 
   return (
     <div className="App">
-      <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
-      <SpeechRecognitionComponent onResult={handleSpeechReco} language={language} />
+      <div className="menu-container">
+        <MenuDropdown
+          label="Mode de saisie"
+          options={modeOptions}
+          onItemChange={handleModeChange}
+          selectedItem={inputMode}
+        />
+        <MenuDropdown
+          label="Language"
+          options={languageOptions}
+          onItemChange={handleLanguageChange}
+          selectedItem={language}
+        />
+      </div>
 
+      {/* START GAME */}
       {gameStep === 'intro' && (
-        <div>
+        <div className="button-container">
           <label>
             Nombre d'extraits :
             <input type="number" value={maxExcerpts} onChange={handleExcerptsChange} min="1" />
@@ -173,16 +209,65 @@ function App() {
           <button onClick={handleStartGame}>Démarrer le jeu</button>
         </div>
       )}
-      {gameStep === 'chooseTheme' && <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />}
-      {gameStep === 'startSong' && <button onClick={handleStartSong}>Lancer l'extrait</button>}
-      {gameStep === 'playClip' && <button onClick={handleStopSong}>Arrêter l'extrait et deviner le titre</button>}
-      {gameStep === 'guessTitle' && <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />}
-      {gameStep === 'end' && <div>Le jeu est terminé. Votre score : {points} points.</div>}
+      {/* CHOOSE THEME */}
+      {inputMode === InputModes.TEXT && gameStep === 'chooseTheme' && (
+        <div className="button-container">
+          <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />
+        </div>
+      )}
+      {inputMode === InputModes.VOCAL && gameStep === 'chooseTheme' && (
+        <SpeechRecognitionComponent onResult={handleSpeechReco} language={language} />
+      )}
+      {inputMode === InputModes.MIXED && gameStep === 'chooseTheme' && (
+        <>
+          <div className="button-container">
+            <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />
+          </div>
+          <SpeechRecognitionComponent onResult={handleSpeechReco} language={language} />
+        </>
+      )}
+      {/* START SONG */}
+      {gameStep === 'startSong' && (
+        <div className="button-container">
+          <button onClick={handleStartSong}>Lancer l'extrait</button>
+        </div>
+      )}
+      {/* PLAY SONG */}
+      {gameStep === 'playClip' && (
+        <div className="button-container">
+          <button onClick={handleStopSong}>Arrêter l'extrait et deviner le titre</button>
+        </div>
+      )}
+      {/* GUESS SONG */}
+      {inputMode === InputModes.TEXT && gameStep === 'guessTitle' && (
+        <div className="button-container">
+          <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />
+        </div>
+      )}
+      {inputMode === InputModes.VOCAL && gameStep === 'guessTitle' && (
+        <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
+      )}
+      {inputMode === InputModes.MIXED && gameStep === 'guessTitle' && (
+        <>
+          <div className="button-container">
+            <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />
+          </div>
+          <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
+        </>
+      )}
+      {/* END */}
+      {gameStep === 'end' && (
+        <div className="button-container">
+          <div>Le jeu est terminé. Votre score : {points} points.</div>
+        </div>
+      )}
+
+      <div className="score-info">
+        <div>Points: {points}</div>
+        <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
+      </div>
 
       <ResponsesComponent responses={responses} />
-      <div>Points: {points}</div>
-      <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
-
       <button onClick={handleLogMessageHistory}>Log message history</button>
     </div>
   );

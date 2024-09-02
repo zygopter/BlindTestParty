@@ -1,0 +1,53 @@
+/* src/components/MenuDropdown.css */
+
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+  
+/* Styles for the dropdown button */
+.dropdown-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 10px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+.dropdown-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Styles for the dropdown menu */
+.dropdown-menu {
+    display: none; /* Hidden by default */
+    position: absolute;
+    right: 0; /* Align the dropdown to the right */
+    top: 100%; /* Position it directly below the button */
+    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+    min-width: 160px;
+    border-radius: 8px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.dropdown-menu a {
+    color: #fff;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Show the dropdown menu when the container is hovered */
+.dropdown-container:hover .dropdown-menu {
+    display: block;
+}

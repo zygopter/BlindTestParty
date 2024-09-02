@@ -42,7 +42,11 @@ function SpeechRecognitionComponent({ onResult, language }) {
     };
 
     setRecognition(recognitionInstance);
-  }, [onResult, language, stopListening]);
+
+    return () => {
+      recognitionInstance.stop();
+    };
+  }, [onResult, language]);
 
   return (
     <div>
