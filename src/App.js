@@ -7,6 +7,7 @@ import MenuDropdown from './components/common/MenuDropDown';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
+import NeonAnimation from './components/NeonAnimation';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
@@ -184,6 +185,7 @@ function App() {
 
   return (
     <div className="App">
+      <NeonAnimation gameState={gameStep} />
       <div className="menu-container">
         <MenuDropdown
           label="Mode de saisie"

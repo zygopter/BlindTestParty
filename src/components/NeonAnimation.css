@@ -1,0 +1,19 @@
+.lottie-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Ensure clicks go through the animation layer */
+    z-index: 2; /* Between background (1) and content (3) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(20px, -75px);
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+}
+
+.lottie-animation.fade-out {
+    opacity: 0;
+}
