@@ -28,6 +28,27 @@
   color: #61dafb;
 }
 
+.App::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* noir avec 50% d'opacité */
+  z-index: -1; /* pour le placer derrière le contenu */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url('/public/images/desktop-background.webp');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top;
+  font-family: 'Arial', sans-serif;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
