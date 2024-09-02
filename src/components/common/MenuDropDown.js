@@ -9,7 +9,7 @@ function MenuDropDown({ label, options, onItemChange, selectedItem }) {
           </button>
           <div className="dropdown-menu">
             {options.map((option, index) => (
-              <a href="#" key={index} onClick={() => onItemChange(option.value)}>
+              <a className={`dropdown-item ${option.value === selectedItem ? 'selected' : ''}`} href="#" key={index} onClick={() => onItemChange(option.value)}>
                 {option.label}
               </a>
             ))}
