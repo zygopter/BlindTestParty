@@ -12,11 +12,13 @@ import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
 import InteractionStates from './utils/InteractionState';
+import DebugMenu from './components/DebugMenu';
 
 
 function App() {
   const [gameId, setGameId] = useState(null);
   const [responses, setResponses] = useState([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   // const [speechText, setSpeechText] = useState('');
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
@@ -189,6 +191,10 @@ function App() {
     // eslint-disable-next-line
   }, [excerptCount, maxExcerpts]);
 
+  const handleShowAnswersHistory = () => {
+    setIsHistoryOpen(true);
+  };
+
   const handleLogMessageHistory = async () => {
     try {
       const data = await logMessageHistory(gameId);
@@ -285,8 +291,13 @@ function App() {
         <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
       </div>
 
-      <ResponsesComponent responses={responses} />
-      <button onClick={handleLogMessageHistory}>Log message history</button>
+      <DebugMenu
+        onShowAnswersHistory={handleShowAnswersHistory}
+        onLogMessageHistory={handleLogMessageHistory}
+      />
+      {isHistoryOpen && (
+        <ResponsesComponent history={responses} onClose={() => setIsHistoryOpen(false)} />
+      )}
     </div>
   );
 }
