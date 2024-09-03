@@ -6,6 +6,13 @@ body {
   background-size: cover;
 }
 
+@media (max-width: 768px) {
+  body {
+    background-image: url('/public/images/mobile-background.webp');
+    background-position: top; /* Adjust if needed */
+  }
+}
+
 body, html {
   height: 100%;
   margin: 0;
@@ -19,6 +26,12 @@ body, html {
 
 h1, h2, h3 {
   color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  h1, h2, h3 {
+    font-size: 4vw; /* Larger text for mobile */
+  }
 }
 
 button {
@@ -91,6 +104,13 @@ label {
   color: #fff;
 }
 
+@media (max-width: 768px) {
+  .button-container {
+    top: 50%; /* Adjust for mobile */
+    width: 90%; /* Adjust width for smaller screens */
+  }
+}
+
 /* Additional styling for score information */
 .score-info {
   position: absolute;
@@ -111,4 +131,21 @@ label {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5); /* Dark overlay */
   z-index: -1; /* Place behind content */
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 15px;
+  }
+
+  .menu-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-info {
+    font-size: 3vw; /* Smaller font on mobile */
+  }
 }

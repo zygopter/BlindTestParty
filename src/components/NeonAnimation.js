@@ -28,7 +28,7 @@ function NeonAnimation({ interactionState }) {
             <Lottie
                 animationData={animationData}
                 loop={true}
-                style={{ width: '78%', height: '78%' }}
+                className="lottie-animation-content"
             />
         </div>
     );

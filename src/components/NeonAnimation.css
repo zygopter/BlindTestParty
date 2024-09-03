@@ -4,8 +4,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Ensure clicks go through the animation layer */
-    z-index: 2; /* Between background (1) and content (3) */
+    pointer-events: none;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,3 +17,20 @@
 .lottie-animation.fade-out {
     opacity: 0;
 }
+
+.lottie-animation .lottie-animation-content {
+    width: 78%;
+    height: 78%;
+}
+
+@media (max-width: 768px) {
+    .lottie-animation {
+        transform: translate(0px, 0px);
+    }
+
+    .lottie-animation .lottie-animation-content {
+        transform: translate(0px, 0px);
+        width: 89%;
+        height: 89%;
+    }
+  }
