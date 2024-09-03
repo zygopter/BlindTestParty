@@ -11,6 +11,7 @@ import NeonAnimation from './components/NeonAnimation';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
+import InteractionStates from './utils/InteractionState';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
   const [speechText, setSpeechText] = useState('');
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
+  const [interactionState, setInteractionState] = useState(InteractionStates.IDLE);
   const [theme, setTheme] = useState('');
   const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
@@ -43,11 +45,13 @@ function App() {
   
   const handleStartGame = async () => {
     try {
+      setInteractionState(InteractionStates.SPEAKING);
       const data = await startGame();
       setGameId(data.gameId);
       setResponses([data.gptAnswer]);
       await speak(data.gptAnswer);
       setGameStep('chooseTheme');
+      setInteractionState(InteractionStates.WAITING);
     } catch (error) {
       console.error('Error starting game:', error);
     }
@@ -55,11 +59,13 @@ function App() {
 
   const handleChooseTheme = async (theme) => {
     try {
+      setInteractionState(InteractionStates.SPEAKING);
       const data = await chooseTheme(gameId, theme);
       setTheme(data.gameState.theme);
       setResponses([...responses, data.gptAnswer]);
       await speak(data.gptAnswer);
       setGameStep('startSong');
+      setInteractionState(InteractionStates.IDLE);
     } catch (error) {
       console.error('Error choosing theme:', error);
     }
@@ -67,11 +73,14 @@ function App() {
 
   const handleStartSong = async () => {
     if (excerptCount >= 5) {
+      setInteractionState(InteractionStates.SPEAKING);
       await speak('Le jeu est terminé ! Vous avez joué tous les extraits.');
       setGameStep('end'); // Marquer la fin du jeu
+      setInteractionState(InteractionStates.IDLE);
       return;
     }
     try {
+      setInteractionState(InteractionStates.SPEAKING);
       const data = await startSong(gameId);
       setGameStep('playClip');
       setResponses([...responses, data.parsedAnswer.texte]);
@@ -79,6 +88,7 @@ function App() {
         currentSound.current.stop();
       }
       await speak(data.parsedAnswer.texte);
+      setInteractionState(InteractionStates.WAITING);
 
       currentSound.current = new Howl({
         src: [data.trackUrl],
@@ -95,6 +105,7 @@ function App() {
 
   const handleSubmitAnswer = async (userAnswer) => {
     try {
+      setInteractionState(InteractionStates.SPEAKING);
       let data;
       if (tentativeCount === 0) {
         data = await submitAnswer(gameId, userAnswer);
@@ -110,16 +121,19 @@ function App() {
         setTentativeCount(0);
         setExcerptCount((prevCount) => prevCount + 1);
         setGameStep('startSong');
+        setInteractionState(InteractionStates.IDLE);
       } else if (tentativeCount > 0) {
         setTentativeCount(0);
         setExcerptCount((prevCount) => prevCount + 1);
         setGameStep('startSong');
+        setInteractionState(InteractionStates.IDLE);
       } else {
         setTentativeCount(1);
         if (currentSound.current) {
           currentSound.current.play();
         }
         setGameStep('playClip');
+        setInteractionState(InteractionStates.WAITING);
       }
     } catch (error) {
       console.error('Error submitting answer:', error);
@@ -185,7 +199,7 @@ function App() {
 
   return (
     <div className="App">
-      <NeonAnimation gameState={gameStep} />
+      <NeonAnimation interactionState={interactionState} />
       <div className="menu-container">
         <MenuDropdown
           label="Mode de saisie"
