@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+
 
 // Fonction pour démarrer un nouveau jeu
 export const startGame = async () => {
   try {
+    console.log('Posting to ', API_BASE_URL);
     const response = await axios.post(`${API_BASE_URL}/game/start-game`);
     return response.data;
   } catch (error) {
