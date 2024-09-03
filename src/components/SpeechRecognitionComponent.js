@@ -46,6 +46,7 @@ function SpeechRecognitionComponent({ onResult, language }) {
     return () => {
       recognitionInstance.stop();
     };
+    // eslint-disable-next-line
   }, [onResult, language]);
 
   return (

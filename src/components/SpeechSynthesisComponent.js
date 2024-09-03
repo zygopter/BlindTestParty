@@ -1,5 +1,3 @@
-import React, { useEffect } from 'react';
-
 function useSpeechSynthesis(language) {
   const speak = (text) => {
     return new Promise((resolve) => {

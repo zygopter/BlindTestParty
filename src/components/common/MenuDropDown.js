@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './MenuDropDown.css'
 
 function MenuDropDown({ label, options, onItemChange, selectedItem }) {
@@ -9,6 +9,7 @@ function MenuDropDown({ label, options, onItemChange, selectedItem }) {
           </button>
           <div className="dropdown-menu">
             {options.map((option, index) => (
+            // eslint-disable-next-line
               <a className={`dropdown-item ${option.value === selectedItem ? 'selected' : ''}`} href="#" key={index} onClick={() => onItemChange(option.value)}>
                 {option.label}
               </a>

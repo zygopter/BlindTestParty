@@ -17,7 +17,7 @@ import InteractionStates from './utils/InteractionState';
 function App() {
   const [gameId, setGameId] = useState(null);
   const [responses, setResponses] = useState([]);
-  const [speechText, setSpeechText] = useState('');
+  // const [speechText, setSpeechText] = useState('');
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
   const [interactionState, setInteractionState] = useState(InteractionStates.IDLE);
@@ -183,9 +183,10 @@ function App() {
 
   useEffect(() => {
     if (excerptCount >= maxExcerpts) {
-      speak('Félicitations ! Vous avez deviné ${maxExcerpts} extraits. Le jeu est terminé.');
+      speak('Félicitations ! Vous avez deviné tous les extraits. Le jeu est terminé.');
       setGameStep('end');
     }
+    // eslint-disable-next-line
   }, [excerptCount, maxExcerpts]);
 
   const handleLogMessageHistory = async () => {
@@ -279,6 +280,7 @@ function App() {
       )}
 
       <div className="score-info">
+        <div>Theme: {theme}</div>
         <div>Points: {points}</div>
         <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
       </div>
