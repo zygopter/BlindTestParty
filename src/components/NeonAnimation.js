@@ -22,7 +22,7 @@ function NeonAnimation({ gameState }) {
             <Lottie
                 animationData={animationData}
                 loop={true}
-                style={{ width: '70%', height: '70%' }}
+                style={{ width: '78%', height: '78%' }}
             />
         </div>
     );
