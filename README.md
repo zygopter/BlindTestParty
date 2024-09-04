@@ -1,74 +1,73 @@
-# BlindTestParty
-Application de blind test musical en solo ou à plusieurs
+# BlindTest Party - Frontend
 
+This is the **frontend** part of the BlindTest Party web application, where users can interact with a music guessing game. The frontend allows users to choose themes, listen to music clips, and guess the songs either via text input or voice input.
 
-# Getting Started with Create React App
+A live version of the app is available at: [BlindTest Party Live](https://blindtest-party.netlify.app/)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<img src="./public/images/preview-desktop.png" alt="drawing" width="700" style="display: block; margin: 0 auto"/>
 
-## Available Scripts
+<img src="./public/images/preview-mobile.png" alt="drawing" width="300" style="display: block; margin: 0 auto"/>
 
-In the project directory, you can run:
+## Table of Contents
+- [Technologies](#technologies)
+- [Features](#features)
+- [Setup and Installation](#setup-and-installation)
+- [Environment Variables](#environment-variables)
+- [Running the Project Locally](#running-the-project-locally)
+- [Deployment](#deployment)
+  
+## Technologies
+- **React.js** for UI
+- **Lottie** for animations
+- **Web Speech API** for voice recognition and TTS
+- **OpenAI TTS API** for enhanced voice synthesis
+- **Axios** for API requests
+- **Netlify** for frontend hosting
+- **CSS** for styling and responsive design
 
-### `npm start`
+## Features
+- Users can switch between text and voice input modes.
+- Responsive design optimized for desktop and mobile.
+- Multiple languages supported for game interaction.
+- Smooth voice-to-text and text-to-voice gameplay experience.
+- Lottie animations that react to game states (speaking, idle, waiting).
+- Integration with backend for song clips and game management.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup and Installation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Prerequisites
+- **Node.js** and **npm** installed locally.
+- An account with **OpenAI** (for TTS).
+- A deployed backend service.
 
-### `npm test`
+### Steps to Install Locally
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/your-repo/blindtest-frontend.git
+   cd blindtest-frontend
+   ```
+2. Install the dependencies:
+    ```bash
+    npm install
+    ```
+3. Set up your environment variables in a `.env` file (see below).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Environment Variables
+Create a `.env` file at the root of the project with the following variables:
+```bash
+REACT_APP_BACKEND_URL=https://your-backend-url.com
+REACT_APP_OPENAI_API_KEY=your-openai-api-key
+REACT_APP_SPOTIFY_CLIENT_ID=your-spotify-client-id
+REACT_APP_SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
+```
 
-### `npm run build`
+## Running the Project Locally
+To run the development server:
+```bash
+npm start
+```
+This will start the React app on `http://localhost:3000`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Deployment
+For deployment, the project uses **Netlify**.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
