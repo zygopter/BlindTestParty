@@ -8,6 +8,7 @@ import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
 import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
 import NeonAnimation from './components/NeonAnimation';
+import LightsAnimation from './components/LightsAnimation';
 import useSpeechSynthesis from './components/SpeechSynthesisComponent';
 import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
@@ -23,6 +24,7 @@ function App() {
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
   const [interactionState, setInteractionState] = useState(InteractionStates.IDLE);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [theme, setTheme] = useState('');
   const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
@@ -91,6 +93,7 @@ function App() {
       }
       await speak(data.parsedAnswer.texte);
       setInteractionState(InteractionStates.WAITING);
+      setIsPlaying(true);
 
       currentSound.current = new Howl({
         src: [data.trackUrl],
@@ -167,6 +170,7 @@ function App() {
     if (currentSound.current) {
       currentSound.current.stop();
     }
+    setIsPlaying(false);
     setGameStep('guessTitle');
   };
 
@@ -207,6 +211,9 @@ function App() {
   return (
     <div className="App">
       <NeonAnimation interactionState={interactionState} />
+      {isPlaying && (
+        <LightsAnimation />
+      )}
       <div className="menu-container">
         <MenuDropdown
           label="Mode de saisie"
