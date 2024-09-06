@@ -14,25 +14,27 @@ import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
 import InteractionStates from './utils/InteractionState';
 import DebugMenu from './components/DebugMenu';
+import { speakWithOpenAITTS } from './components/OpenAISpeechSynthesis';
 
 
 function App() {
   const [gameId, setGameId] = useState(null);
   const [responses, setResponses] = useState([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  // const [speechText, setSpeechText] = useState('');
   const [language, setLanguage] = useState('fr-FR');
   const [gameStep, setGameStep] = useState('intro');
   const [interactionState, setInteractionState] = useState(InteractionStates.IDLE);
   const [isPlaying, setIsPlaying] = useState(false);
   const [theme, setTheme] = useState('');
-  const currentSound = useRef(null);
   const [points, setPoints] = useState(0);
   const [excerptCount, setExcerptCount] = useState(0);
   const [maxExcerpts, setMaxExcerpts] = useState(5);
   const [tentativeCount, setTentativeCount] = useState(0);
   const [inputMode, setInputMode] = useState(InputModes.TEXT);
+  const [voice, setVoice] = useState('WEB');
+  const currentSound = useRef(null);
   const { speak } = useSpeechSynthesis(language);
+  
 
   const languageOptions = [
     { value: 'fr-FR', label: 'Français' },
@@ -46,6 +48,12 @@ function App() {
     { value: InputModes.VOCAL, label: 'Vocal' },
     { value: InputModes.MIXED, label: 'Mixte' },
   ];
+
+  const voiceOptions = [
+    { value: 'WEB', label: 'Robot'},
+    { value: 'OPENAI', label: 'Handsome'},
+    { value: 'NONE', label: 'Mute'}
+  ]
   
   const handleStartGame = async () => {
     try {
@@ -53,7 +61,7 @@ function App() {
       const data = await startGame();
       setGameId(data.gameId);
       setResponses([data.gptAnswer]);
-      await speak(data.gptAnswer);
+      speakText(data.gptAnswer, 'Welcome!');
       setGameStep('chooseTheme');
       setInteractionState(InteractionStates.WAITING);
     } catch (error) {
@@ -67,7 +75,7 @@ function App() {
       const data = await chooseTheme(gameId, theme);
       setTheme(data.gameState.theme);
       setResponses([...responses, data.gptAnswer]);
-      await speak(data.gptAnswer);
+      speakText(data.gptAnswer, 'Ready?!');
       setGameStep('startSong');
       setInteractionState(InteractionStates.IDLE);
     } catch (error) {
@@ -78,7 +86,7 @@ function App() {
   const handleStartSong = async () => {
     if (excerptCount >= 5) {
       setInteractionState(InteractionStates.SPEAKING);
-      await speak('Le jeu est terminé ! Vous avez joué tous les extraits.');
+      speakText('Le jeu est terminé ! Vous avez joué tous les extraits.', 'Allez ciao!');
       setGameStep('end'); // Marquer la fin du jeu
       setInteractionState(InteractionStates.IDLE);
       return;
@@ -91,7 +99,7 @@ function App() {
       if (currentSound.current) {
         currentSound.current.stop();
       }
-      await speak(data.parsedAnswer.texte);
+      speakText(data.parsedAnswer.texte, 'Accroche toi à ton slip!');
       setInteractionState(InteractionStates.WAITING);
       setIsPlaying(true);
 
@@ -120,7 +128,7 @@ function App() {
       setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
 
-      await speak(data.parsedAnswer.texte);
+      speakText(data.parsedAnswer.texte, 'Voilà tes points!');
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
         setTentativeCount(0);
@@ -180,16 +188,36 @@ function App() {
   };
 
   const handleModeChange = (mode) => {
+    console.log('Mode selected:', mode);
     setInputMode(mode);
+  };
+
+  const handleVoiceChange = (voice) => {
+    console.log('Voice selected:', voice);
+    setVoice(voice);
   };
 
   const handleExcerptsChange = (e) => {
     setMaxExcerpts(Number(e.target.value));
   };
 
+  const speakText = async (text, textDefault) => {
+    switch (voice) {
+      case 'WEB':
+        await speak(text);
+        break;
+      case 'HANDSOME':
+        await speakWithOpenAITTS(text, language);
+        break;
+      default:
+        await speak(textDefault)
+        break;
+    }
+  };
+
   useEffect(() => {
     if (excerptCount >= maxExcerpts) {
-      speak('Félicitations ! Vous avez deviné tous les extraits. Le jeu est terminé.');
+      speakText('Félicitations ! Vous avez deviné tous les extraits. Le jeu est terminé.', 'Allez ciao!');
       setGameStep('end');
     }
     // eslint-disable-next-line
@@ -226,6 +254,12 @@ function App() {
           options={languageOptions}
           onItemChange={handleLanguageChange}
           selectedItem={language}
+        />
+        <MenuDropdown
+          label="Voice"
+          options={voiceOptions}
+          onItemChange={handleVoiceChange}
+          selectedItem={voice}
         />
       </div>
 
