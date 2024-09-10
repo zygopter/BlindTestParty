@@ -247,7 +247,7 @@ function App() {
       case 'WEB':
         await speak(text);
         break;
-      case 'HANDSOME':
+      case 'OPENAI':
         await speakWithOpenAITTS(text, language);
         break;
       default:
