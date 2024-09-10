@@ -14,6 +14,7 @@ import GameSteps from './utils/GameSteps';
 import InputModes from './utils/InputModes';
 import InteractionStates from './utils/InteractionState';
 import DebugMenu from './components/DebugMenu';
+import Loader from './components/Loader';
 import { speakWithOpenAITTS } from './components/OpenAISpeechSynthesis';
 
 
@@ -32,6 +33,9 @@ function App() {
   const [tentativeCount, setTentativeCount] = useState(0);
   const [inputMode, setInputMode] = useState(InputModes.TEXT);
   const [voice, setVoice] = useState('WEB');
+  const [loading, setLoading] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+
   const currentSound = useRef(null);
   const { speak } = useSpeechSynthesis(language);
   
@@ -234,6 +238,27 @@ function App() {
     } catch (error) {
       console.error('Error starting song:', error);
     }
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setFadeOut(true);
+    }, 1000);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <div className={`loading-background ${fadeOut ? 'fade-out' : ''}`}>
+          <Loader /> {/* Assure-toi que ce composant existe et est bien importé */}
+        </div>
+      </>
+    );
   }
 
   return (
