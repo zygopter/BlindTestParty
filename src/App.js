@@ -2,7 +2,7 @@ import './App.css';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
-import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer, logMessageHistory } from './api/game';
+import { startGame, chooseTheme, startSong, submitAnswer, completeAnswer, submitAnswerOrRequest, logMessageHistory } from './api/game';
 import MenuDropdown from './components/common/MenuDropDown';
 import InputComponent from './components/InputComponent';
 import ResponsesComponent from './components/ResponsesComponent';
@@ -15,6 +15,7 @@ import InputModes from './utils/InputModes';
 import InteractionStates from './utils/InteractionState';
 import DebugMenu from './components/DebugMenu';
 import Loader from './components/Loader';
+
 import { speakWithOpenAITTS } from './components/OpenAISpeechSynthesis';
 
 
@@ -156,6 +157,42 @@ function App() {
       console.error('Error submitting answer:', error);
     }
   };
+
+  const handleGuessOrHint = async (userAnswer) => {
+    try {
+      setInteractionState(InteractionStates.SPEAKING);
+      const data = await submitAnswerOrRequest(gameId, userAnswer);
+      setResponses([...responses, data.parsedAnswer.texte]);
+      await speakText(data.parsedAnswer.texte, 'OK!');
+
+      // Stay in scope
+      if (!data.isDone) {
+        if (currentSound.current) {
+          currentSound.current.play();
+        }
+        setGameStep('playClip');
+        setInteractionState(InteractionStates.WAITING);
+      }
+      else {
+        if ((data.parsedAnswer.guessedItems.artiste && data.parsedAnswer.guessedItems.titre) ||
+            data.parsedAnswer.evaluated_answer === 'complete') {
+          setPoints(3);
+        } else if ((data.parsedAnswer.guessedItems.artiste || data.parsedAnswer.guessedItems.titre) ||
+            data.parsedAnswer.evaluated_answer === 'partial') {
+          setPoints(1);
+        }
+        setExcerptCount((prevCount) => prevCount + 1);
+        setGameStep('startSong');
+        setInteractionState(InteractionStates.IDLE);
+      }
+    } catch (error) {
+      console.error('Error submitting answer or asking for hint:', error);
+    }
+  };
+
+  const handleHint = async () => {
+    handleGuessOrHint('Donne moi un indice stp');
+  }
 
   const handleSpeechReco = async (userAnswer) => {
     try {
@@ -330,7 +367,8 @@ function App() {
       {/* GUESS SONG */}
       {inputMode === InputModes.TEXT && gameStep === 'guessTitle' && (
         <div className="button-container">
-          <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />
+          <InputComponent onSubmit={handleGuessOrHint} placeholder="Entrer la réponse... (Guess or hint)" />
+          <button onClick={handleHint}>Donne moi un indice</button>
         </div>
       )}
       {inputMode === InputModes.VOCAL && gameStep === 'guessTitle' && (

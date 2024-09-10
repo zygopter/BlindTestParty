@@ -59,6 +59,17 @@ export const completeAnswer = async (gameId, userAnswer) => {
   }
 };
 
+// Fonction pour soumettre une réponse ou une requête
+export const submitAnswerOrRequest = async (gameId, userAnswer) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/game/submit-answer-or-request`, { gameId, userAnswer });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to submit the answer:', error);
+    throw error;
+  }
+};
+
 // DEBUG: Log message history
 export const logMessageHistory = async (gameId) => {
   try {
