@@ -66,7 +66,7 @@ function App() {
       const data = await startGame();
       setGameId(data.gameId);
       setResponses([data.gptAnswer]);
-      speakText(data.gptAnswer, 'Welcome!');
+      await speakText(data.gptAnswer, 'Welcome!');
       setGameStep('chooseTheme');
       setInteractionState(InteractionStates.WAITING);
     } catch (error) {
@@ -80,7 +80,7 @@ function App() {
       const data = await chooseTheme(gameId, theme);
       setTheme(data.gameState.theme);
       setResponses([...responses, data.gptAnswer]);
-      speakText(data.gptAnswer, 'Ready?!');
+      await speakText(data.gptAnswer, 'Ready?!');
       setGameStep('startSong');
       setInteractionState(InteractionStates.IDLE);
     } catch (error) {
@@ -91,7 +91,7 @@ function App() {
   const handleStartSong = async () => {
     if (excerptCount >= 5) {
       setInteractionState(InteractionStates.SPEAKING);
-      speakText('Le jeu est terminé ! Vous avez joué tous les extraits.', 'Allez ciao!');
+      await speakText('Le jeu est terminé ! Vous avez joué tous les extraits.', 'Allez ciao!');
       setGameStep('end'); // Marquer la fin du jeu
       setInteractionState(InteractionStates.IDLE);
       return;
@@ -104,7 +104,7 @@ function App() {
       if (currentSound.current) {
         currentSound.current.stop();
       }
-      speakText(data.parsedAnswer.texte, 'Accroche toi à ton slip!');
+      await speakText(data.parsedAnswer.texte, 'Accroche toi à ton slip!');
       setInteractionState(InteractionStates.WAITING);
       setIsPlaying(true);
 
@@ -133,7 +133,7 @@ function App() {
       setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
 
-      speakText(data.parsedAnswer.texte, 'Voilà tes points!');
+      await speakText(data.parsedAnswer.texte, 'Voilà tes points!');
       if (data.success) {
         // Passer à l'extrait suivant ou terminer le jeu
         setTentativeCount(0);

@@ -34,7 +34,11 @@ export const speakWithOpenAITTS = async (text, language) => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-      audio.play();
+      return new Promise((resolve, reject) => {
+        audio.onended = resolve;
+        audio.onerror = reject;
+        audio.play();
+      });
     } catch (error) {
       console.error('Error with OpenAI TTS:', error);
     }
