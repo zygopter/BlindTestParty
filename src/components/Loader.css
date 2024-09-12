@@ -1,11 +1,11 @@
 /* src/components/Loader.css */
 .loading-background {
-    position: fixed; /* Assure que le fond couvre toute la fenêtre */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #175D9B;
+    background-color: #175d9b6b;
     z-index: 999;
     display: flex;
     justify-content: center;

@@ -92,7 +92,7 @@ label {
 /* Container for centering the buttons */
 .button-container {
   position: absolute;
-  top: 30%; /* Adjust this value based on the position of the circle in your background */
+  top: 40%; /* Adjust this value based on the position of the circle in your background */
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;

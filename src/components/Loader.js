@@ -8,7 +8,7 @@ const Loader = () => {
   return (
     <div className="loader">
       <Lottie animationData={spinnerAnimation} loop={true} />
-      <h1>CATGPT</h1>
+      <h2>Chat-rgement ... </h2>
     </div>
   );
 };

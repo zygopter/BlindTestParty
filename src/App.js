@@ -63,9 +63,13 @@ function App() {
   const handleStartGame = async () => {
     try {
       setInteractionState(InteractionStates.SPEAKING);
+      setLoading(true);
       const data = await startGame();
       setGameId(data.gameId);
       setResponses([data.gptAnswer]);
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
       await speakText(data.gptAnswer, 'Welcome!');
       setGameStep('chooseTheme');
       setInteractionState(InteractionStates.WAITING);
@@ -77,9 +81,13 @@ function App() {
   const handleChooseTheme = async (theme) => {
     try {
       setInteractionState(InteractionStates.SPEAKING);
+      setLoading(true);
       const data = await chooseTheme(gameId, theme);
       setTheme(data.gameState.theme);
       setResponses([...responses, data.gptAnswer]);
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
       await speakText(data.gptAnswer, 'Ready?!');
       setGameStep('startSong');
       setInteractionState(InteractionStates.IDLE);
@@ -98,12 +106,16 @@ function App() {
     }
     try {
       setInteractionState(InteractionStates.SPEAKING);
+      setLoading(true);
       const data = await startSong(gameId);
       setGameStep('playClip');
       setResponses([...responses, data.parsedAnswer.texte]);
       if (currentSound.current) {
         currentSound.current.stop();
       }
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
       await speakText(data.parsedAnswer.texte, 'Accroche toi à ton slip!');
       setInteractionState(InteractionStates.WAITING);
       setIsPlaying(true);
@@ -124,6 +136,7 @@ function App() {
   const handleSubmitAnswer = async (userAnswer) => {
     try {
       setInteractionState(InteractionStates.SPEAKING);
+      setLoading(true);
       let data;
       if (tentativeCount === 0) {
         data = await submitAnswer(gameId, userAnswer);
@@ -132,6 +145,9 @@ function App() {
       }
       setResponses([...responses, data.parsedAnswer.texte]);
       setPoints(data.points);
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
 
       await speakText(data.parsedAnswer.texte, 'Voilà tes points!');
       if (data.success) {
@@ -161,8 +177,12 @@ function App() {
   const handleGuessOrHint = async (userAnswer) => {
     try {
       setInteractionState(InteractionStates.SPEAKING);
+      setLoading(true);
       const data = await submitAnswerOrRequest(gameId, userAnswer);
       setResponses([...responses, data.parsedAnswer.texte]);
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
       await speakText(data.parsedAnswer.texte, 'OK!');
 
       // Stay in scope
@@ -288,15 +308,6 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <>
-        <div className={`loading-background ${fadeOut ? 'fade-out' : ''}`}>
-          <Loader /> {/* Assure-toi que ce composant existe et est bien importé */}
-        </div>
-      </>
-    );
-  }
 
   return (
     <div className="App">
@@ -325,8 +336,13 @@ function App() {
         />
       </div>
 
+      {loading && (
+        <div className="button-container">
+          <Loader />
+        </div>
+      )}
       {/* START GAME */}
-      {gameStep === 'intro' && (
+      {!loading && gameStep === 'intro' && (
         <div className="button-container">
           <label>
             Nombre d'extraits :
@@ -336,15 +352,15 @@ function App() {
         </div>
       )}
       {/* CHOOSE THEME */}
-      {inputMode === InputModes.TEXT && gameStep === 'chooseTheme' && (
+      {!loading && inputMode === InputModes.TEXT && gameStep === 'chooseTheme' && (
         <div className="button-container">
           <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />
         </div>
       )}
-      {inputMode === InputModes.VOCAL && gameStep === 'chooseTheme' && (
+      {!loading && inputMode === InputModes.VOCAL && gameStep === 'chooseTheme' && (
         <SpeechRecognitionComponent onResult={handleSpeechReco} language={language} />
       )}
-      {inputMode === InputModes.MIXED && gameStep === 'chooseTheme' && (
+      {!loading && inputMode === InputModes.MIXED && gameStep === 'chooseTheme' && (
         <>
           <div className="button-container">
             <InputComponent onSubmit={handleChooseTheme} placeholder="Choisir le thème..." />
@@ -353,28 +369,28 @@ function App() {
         </>
       )}
       {/* START SONG */}
-      {gameStep === 'startSong' && (
+      {!loading && gameStep === 'startSong' && (
         <div className="button-container">
           <button onClick={handleStartSong}>Lancer l'extrait</button>
         </div>
       )}
       {/* PLAY SONG */}
-      {gameStep === 'playClip' && (
+      {!loading && gameStep === 'playClip' && (
         <div className="button-container">
           <button onClick={handleStopSong}>Arrêter l'extrait et deviner le titre</button>
         </div>
       )}
       {/* GUESS SONG */}
-      {inputMode === InputModes.TEXT && gameStep === 'guessTitle' && (
+      {!loading && inputMode === InputModes.TEXT && gameStep === 'guessTitle' && (
         <div className="button-container">
           <InputComponent onSubmit={handleGuessOrHint} placeholder="Entrer la réponse... (Guess or hint)" />
           <button onClick={handleHint}>Donne moi un indice</button>
         </div>
       )}
-      {inputMode === InputModes.VOCAL && gameStep === 'guessTitle' && (
+      {!loading && inputMode === InputModes.VOCAL && gameStep === 'guessTitle' && (
         <SpeechRecognitionComponent onResult={handleSubmitAnswer} language={language} />
       )}
-      {inputMode === InputModes.MIXED && gameStep === 'guessTitle' && (
+      {!loading && inputMode === InputModes.MIXED && gameStep === 'guessTitle' && (
         <>
           <div className="button-container">
             <InputComponent onSubmit={handleSubmitAnswer} placeholder="Entrer la réponse..." />
@@ -383,7 +399,7 @@ function App() {
         </>
       )}
       {/* END */}
-      {gameStep === 'end' && (
+      {!loading && gameStep === 'end' && (
         <div className="button-container">
           <div>Le jeu est terminé. Votre score : {points} points.</div>
         </div>
