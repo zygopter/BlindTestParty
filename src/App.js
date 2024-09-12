@@ -308,6 +308,21 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  const resetGame = () => {
+    if (currentSound.current) {
+      currentSound.current.stop();
+    }
+    setGameId(null);
+    setResponses([]);
+    setInteractionState(InteractionStates.IDLE);
+    setGameStep('intro');
+    setIsPlaying(false);
+    setTheme('');
+    setPoints(0);
+    setExcerptCount(0);
+    setTentativeCount(0);
+  };
+  
 
   return (
     <div className="App">
@@ -409,6 +424,9 @@ function App() {
         <div>Theme: {theme}</div>
         <div>Points: {points}</div>
         <div>Extraits devinés : {excerptCount}/{maxExcerpts}</div>
+        {gameStep !== 'intro' && (
+          <button onClick={resetGame}>Quitter la partie</button>
+        )}
       </div>
 
       <DebugMenu
